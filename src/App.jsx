@@ -1,157 +1,75 @@
 import React, { useState } from "react";
 
-function App() {
-  const [students, setStudents] = useState([
-    { id: 1, name: "Ali", hours: 5 },
-    { id: 2, name: "Sofia", hours: 8 },
-  ]);
+import Dashboard from "./pages/Dashboard";
+import Students from "./pages/Students";
+import Instructors from "./pages/Instructors";
+import Vehicles from "./pages/Vehicles";
+import Booking from "./pages/Booking";
 
-  const [instructors] = useState([
-    { id: 1, name: "Moniteur 1" },
-    { id: 2, name: "Moniteur 2" },
-  ]);
+export default function App() {
 
-  const [cars] = useState([
-    { id: 1, type: "Boîte manuelle" },
-    { id: 2, type: "Boîte automatique" },
-  ]);
+  const [page, setPage] = useState("dashboard");
 
-  const [bookings, setBookings] = useState([]);
+  const renderPage = () => {
 
-  const [newBooking, setNewBooking] = useState({
-    student: "",
-    instructor: "",
-    car: "",
-    date: "",
-    time: "",
-  });
+    if (page === "dashboard") return <Dashboard />;
+    if (page === "students") return <Students />;
+    if (page === "instructors") return <Instructors />;
+    if (page === "vehicles") return <Vehicles />;
+    if (page === "booking") return <Booking />;
 
-  const handleChange = (e) => {
-    setNewBooking({
-      ...newBooking,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const addBooking = () => {
-    if (
-      newBooking.student &&
-      newBooking.instructor &&
-      newBooking.car &&
-      newBooking.date &&
-      newBooking.time
-    ) {
-      setBookings([
-        ...bookings,
-        {
-          id: bookings.length + 1,
-          ...newBooking,
-        },
-      ]);
-
-      setNewBooking({
-        student: "",
-        instructor: "",
-        car: "",
-        date: "",
-        time: "",
-      });
-    }
   };
 
   return (
-    <div style={{ fontFamily: "Arial", padding: "30px" }}>
-      <h1>AutoDrive – Dashboard Auto-École</h1>
 
-      <hr />
+    <div style={{ display: "flex", fontFamily: "Arial" }}>
 
-      <h2>Élèves</h2>
-      <ul>
-        {students.map((student) => (
-          <li key={student.id}>
-            {student.name} – {student.hours} heures restantes
-          </li>
-        ))}
-      </ul>
+      <div
+        style={{
+          width: "220px",
+          height: "100vh",
+          background: "#111",
+          color: "white",
+          padding: "20px"
+        }}
+      >
 
-      <h2>Moniteurs</h2>
-      <ul>
-        {instructors.map((i) => (
-          <li key={i.id}>{i.name}</li>
-        ))}
-      </ul>
+        <h2>AutoDrive</h2>
 
-      <h2>Véhicules</h2>
-      <ul>
-        {cars.map((c) => (
-          <li key={c.id}>{c.type}</li>
-        ))}
-      </ul>
+        <div style={{ marginTop: "30px" }}>
 
-      <hr />
+          <p style={{ cursor: "pointer" }} onClick={() => setPage("dashboard")}>
+            Dashboard
+          </p>
 
-      <h2>Créer une réservation</h2>
+          <p style={{ cursor: "pointer" }} onClick={() => setPage("students")}>
+            Élèves
+          </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px" }}>
-        <select name="student" value={newBooking.student} onChange={handleChange}>
-          <option value="">Choisir un élève</option>
-          {students.map((s) => (
-            <option key={s.id} value={s.name}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+          <p style={{ cursor: "pointer" }} onClick={() => setPage("instructors")}>
+            Moniteurs
+          </p>
 
-        <select name="instructor" value={newBooking.instructor} onChange={handleChange}>
-          <option value="">Choisir un moniteur</option>
-          {instructors.map((i) => (
-            <option key={i.id} value={i.name}>
-              {i.name}
-            </option>
-          ))}
-        </select>
+          <p style={{ cursor: "pointer" }} onClick={() => setPage("vehicles")}>
+            Véhicules
+          </p>
 
-        <select name="car" value={newBooking.car} onChange={handleChange}>
-          <option value="">Choisir un véhicule</option>
-          {cars.map((c) => (
-            <option key={c.id} value={c.type}>
-              {c.type}
-            </option>
-          ))}
-        </select>
+          <p style={{ cursor: "pointer" }} onClick={() => setPage("booking")}>
+            Planning
+          </p>
 
-        <input
-          type="date"
-          name="date"
-          value={newBooking.date}
-          onChange={handleChange}
-        />
+        </div>
 
-        <input
-          type="time"
-          name="time"
-          value={newBooking.time}
-          onChange={handleChange}
-        />
-
-        <button onClick={addBooking}>Ajouter réservation</button>
       </div>
 
-      <hr />
+      <div style={{ flex: 1 }}>
 
-      <h2>Planning</h2>
+        {renderPage()}
 
-      {bookings.length === 0 && <p>Aucune réservation pour le moment.</p>}
+      </div>
 
-      <ul>
-        {bookings.map((b) => (
-          <li key={b.id}>
-            {b.date} {b.time} – {b.student} avec {b.instructor} ({b.car})
-          </li>
-        ))}
-      </ul>
     </div>
-  );
-}
 
-export default App;
+  );
+
+}
