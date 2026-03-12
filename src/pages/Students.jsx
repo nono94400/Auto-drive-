@@ -1,35 +1,83 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Students() {
 
-  const students = [
-    { id: 1, name: "Ali", hoursRemaining: 5 },
-    { id: 2, name: "Sofia", hoursRemaining: 8 },
-    { id: 3, name: "Lucas", hoursRemaining: 3 },
-    { id: 4, name: "Emma", hoursRemaining: 10 }
-  ];
+  const [students, setStudents] = useState([]);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  async function fetchStudents() {
+
+    const { data, error } = await supabase
+      .from("students")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+    } else {
+      setStudents(data);
+    }
+  }
+
+  async function addStudent() {
+
+    if (!firstName || !lastName) return;
+
+    const { error } = await supabase
+      .from("students")
+      .insert([
+        {
+          first_name: firstName,
+          last_name: lastName,
+          hours_total: 20,
+          hours_remaining: 20
+        }
+      ]);
+
+    if (error) console.error(error);
+
+    setFirstName("");
+    setLastName("");
+
+    fetchStudents();
+  }
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
+
       <h1>Gestion des élèves</h1>
 
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ background: "#f5f5f5" }}>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Nom</th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Heures restantes</th>
-          </tr>
-        </thead>
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          placeholder="Prénom"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
 
-        <tbody>
-          {students.map(student => (
-            <tr key={student.id}>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>{student.name}</td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>{student.hoursRemaining} h</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <input
+          placeholder="Nom"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+
+        <button onClick={addStudent}>
+          Ajouter élève
+        </button>
+      </div>
+
+      <h2>Liste des élèves</h2>
+
+      {students.map((student) => (
+        <div key={student.id}>
+          {student.first_name} {student.last_name} — {student.hours_remaining}h restantes
+        </div>
+      ))}
 
     </div>
   );
