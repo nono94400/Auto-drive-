@@ -3,7 +3,7 @@ import React from "react";
 export default function Dashboard() {
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Dashboard AutoDrive</h1>
+      <h1>AutoDrive — Logiciel Auto-École</h1>
 
       <p>Bienvenue dans votre logiciel de gestion d'auto-école</p>
 
