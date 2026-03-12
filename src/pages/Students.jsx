@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Students() {
 
   const [students, setStudents] = useState([]);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
 
   useEffect(() => {
-    fetchStudents();
+    loadStudents();
   }, []);
 
-  async function fetchStudents() {
+  async function loadStudents() {
 
     const { data, error } = await supabase
       .from("students")
@@ -19,33 +17,10 @@ export default function Students() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error(error);
+      console.error("Erreur chargement élèves:", error);
     } else {
       setStudents(data);
     }
-  }
-
-  async function addStudent() {
-
-    if (!firstName || !lastName) return;
-
-    const { error } = await supabase
-      .from("students")
-      .insert([
-        {
-          first_name: firstName,
-          last_name: lastName,
-          hours_total: 20,
-          hours_remaining: 20
-        }
-      ]);
-
-    if (error) console.error(error);
-
-    setFirstName("");
-    setLastName("");
-
-    fetchStudents();
   }
 
   return (
@@ -53,31 +28,50 @@ export default function Students() {
 
       <h1>Gestion des élèves</h1>
 
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          placeholder="Prénom"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
+      <table style={{
+        width: "100%",
+        marginTop: "20px",
+        borderCollapse: "collapse"
+      }}>
 
-        <input
-          placeholder="Nom"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
+        <thead>
+          <tr style={{ background: "#f3f3f3" }}>
+            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Nom</th>
+            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Téléphone</th>
+            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Email</th>
+            <th style={{ padding: "10px", border: "1px solid #ddd" }}>Heures restantes</th>
+          </tr>
+        </thead>
 
-        <button onClick={addStudent}>
-          Ajouter élève
-        </button>
-      </div>
+        <tbody>
 
-      <h2>Liste des élèves</h2>
+          {students.map((student) => (
 
-      {students.map((student) => (
-        <div key={student.id}>
-          {student.first_name} {student.last_name} — {student.hours_remaining}h restantes
-        </div>
-      ))}
+            <tr key={student.id}>
+
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {student.first_name} {student.last_name}
+              </td>
+
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {student.phone}
+              </td>
+
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {student.email}
+              </td>
+
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {student.hours_remaining}
+              </td>
+
+            </tr>
+
+          ))}
+
+        </tbody>
+
+      </table>
 
     </div>
   );
