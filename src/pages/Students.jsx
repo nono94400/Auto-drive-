@@ -22,7 +22,11 @@ export default function Students() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (!error) setStudents(data);
+    if (error) {
+      console.log(error);
+    } else {
+      setStudents(data);
+    }
 
   }
 
@@ -57,42 +61,52 @@ export default function Students() {
 
   return (
 
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
+    <div style={{
+      padding: "20px",
+      maxWidth: "900px",
+      margin: "auto",
+      fontFamily: "Arial"
+    }}>
 
       <h1>Gestion des élèves</h1>
 
       <h2>Ajouter un élève</h2>
 
-      <div style={{ marginBottom: "30px" }}>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))",
+        gap: "10px",
+        marginBottom: "30px"
+      }}>
 
         <input
           placeholder="Prénom"
           value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          onChange={(e)=>setFirstName(e.target.value)}
         />
 
         <input
           placeholder="Nom"
           value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          onChange={(e)=>setLastName(e.target.value)}
         />
 
         <input
           placeholder="Téléphone"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e)=>setPhone(e.target.value)}
         />
 
         <input
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e)=>setEmail(e.target.value)}
         />
 
         <input
           placeholder="Heures"
           value={hours}
-          onChange={(e) => setHours(e.target.value)}
+          onChange={(e)=>setHours(e.target.value)}
         />
 
         <button onClick={addStudent}>
@@ -101,51 +115,48 @@ export default function Students() {
 
       </div>
 
-      <table style={{
-        width: "100%",
-        borderCollapse: "collapse"
+
+      <h2>Liste des élèves</h2>
+
+      <div style={{
+        display:"grid",
+        gap:"15px"
       }}>
 
-        <thead>
-          <tr style={{ background: "#eee" }}>
-            <th>Nom</th>
-            <th>Téléphone</th>
-            <th>Email</th>
-            <th>Heures restantes</th>
-          </tr>
-        </thead>
+        {students.map(student => (
 
-        <tbody>
+          <div key={student.id}
+          style={{
+            border:"1px solid #ddd",
+            borderRadius:"10px",
+            padding:"15px",
+            background:"white",
+            boxShadow:"0 2px 5px rgba(0,0,0,0.05)"
+          }}>
 
-          {students.map((student) => (
+            <div style={{
+              fontWeight:"bold",
+              fontSize:"18px"
+            }}>
+              {student.first_name} {student.last_name}
+            </div>
 
-            <tr key={student.id}>
+            <div>
+              📞 {student.phone}
+            </div>
 
-              <td>
-                {student.first_name} {student.last_name}
-              </td>
+            <div>
+              ✉️ {student.email}
+            </div>
 
-              <td>
-                {student.phone}
-              </td>
+            <div style={{marginTop:"5px"}}>
+              ⏱ {student.hours_remaining} heures restantes
+            </div>
 
-              <td>
-                {student.email}
-              </td>
+          </div>
 
-              <td>
-                {student.hours_remaining}
-              </td>
+        ))}
 
-            </tr>
+      </div>
 
-          ))}
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  );
-}
+   
