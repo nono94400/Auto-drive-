@@ -1,162 +1,91 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../supabase";
 
 export default function Students() {
-
   const [students, setStudents] = useState([]);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [hours, setHours] = useState("");
-
-  useEffect(() => {
-    loadStudents();
-  }, []);
 
   async function loadStudents() {
-
     const { data, error } = await supabase
       .from("students")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.log(error);
-    } else {
-      setStudents(data);
-    }
-
+    if (!error) setStudents(data);
   }
 
-  async function addStudent() {
+  useEffect(() => {
+    loadStudents();
+  }, []);
 
-    const { error } = await supabase
-      .from("students")
-      .insert([
-        {
-          first_name: firstName,
-          last_name: lastName,
-          phone: phone,
-          email: email,
-          hours_total: hours,
-          hours_remaining: hours
-        }
-      ]);
+  async function addStudent(e) {
+    e.preventDefault();
 
-    if (!error) {
+    if (!firstName || !lastName) return;
 
-      setFirstName("");
-      setLastName("");
-      setPhone("");
-      setEmail("");
-      setHours("");
+    await supabase.from("students").insert([
+      {
+        first_name: firstName,
+        last_name: lastName,
+      },
+    ]);
 
-      loadStudents();
+    setFirstName("");
+    setLastName("");
 
-    }
+    loadStudents();
+  }
 
+  async function deleteStudent(id) {
+    await supabase.from("students").delete().eq("id", id);
+    loadStudents();
   }
 
   return (
-
-    <div style={{
-      padding: "20px",
-      maxWidth: "900px",
-      margin: "auto",
-      fontFamily: "Arial"
-    }}>
-
+    <div style={{ padding: 20 }}>
       <h1>Gestion des élèves</h1>
 
-      <h2>Ajouter un élève</h2>
-
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))",
-        gap: "10px",
-        marginBottom: "30px"
-      }}>
-
+      <form onSubmit={addStudent} style={{ marginBottom: 20 }}>
         <input
           placeholder="Prénom"
           value={firstName}
-          onChange={(e)=>setFirstName(e.target.value)}
+          onChange={(e) => setFirstName(e.target.value)}
         />
 
         <input
           placeholder="Nom"
           value={lastName}
-          onChange={(e)=>setLastName(e.target.value)}
+          onChange={(e) => setLastName(e.target.value)}
         />
 
-        <input
-          placeholder="Téléphone"
-          value={phone}
-          onChange={(e)=>setPhone(e.target.value)}
-        />
+        <button type="submit">Ajouter élève</button>
+      </form>
 
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-        />
+      <table style={{ width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-        <input
-          placeholder="Heures"
-          value={hours}
-          onChange={(e)=>setHours(e.target.value)}
-        />
+        <tbody>
+          {students.map((s) => (
+            <tr key={s.id}>
+              <td>{s.first_name}</td>
+              <td>{s.last_name}</td>
 
-        <button onClick={addStudent}>
-          Ajouter élève
-        </button>
-
-      </div>
-
-
-      <h2>Liste des élèves</h2>
-
-      <div style={{
-        display:"grid",
-        gap:"15px"
-      }}>
-
-        {students.map(student => (
-
-          <div key={student.id}
-          style={{
-            border:"1px solid #ddd",
-            borderRadius:"10px",
-            padding:"15px",
-            background:"white",
-            boxShadow:"0 2px 5px rgba(0,0,0,0.05)"
-          }}>
-
-            <div style={{
-              fontWeight:"bold",
-              fontSize:"18px"
-            }}>
-              {student.first_name} {student.last_name}
-            </div>
-
-            <div>
-              📞 {student.phone}
-            </div>
-
-            <div>
-              ✉️ {student.email}
-            </div>
-
-            <div style={{marginTop:"5px"}}>
-              ⏱ {student.hours_remaining} heures restantes
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-   
+              <td>
+                <button onClick={() => deleteStudent(s.id)}>
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
